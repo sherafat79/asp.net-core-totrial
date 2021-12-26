@@ -10,11 +10,12 @@ using comero.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace comero.Controllers
-{
+{ 
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private ComeroContext _context;
+        private static Cart _cart = new Cart();
         public HomeController(ILogger<HomeController> logger, ComeroContext context)
         {
             _context = context;
@@ -54,9 +55,44 @@ namespace comero.Controllers
             return View(productData);
         }
 
-        public IActionResult AddToCart(int id)
+        public IActionResult AddToCart(int itemId)
         {
-            return null;
+            var product = _context.Products
+                .Include(p => p.Item)
+                .SingleOrDefault(p => p.ItemId == itemId);
+            if (product!=null)
+            {
+                var cartItem = new CartItem()
+                {
+                    Item = product.Item,
+                    Quantity = 1
+                };
+                _cart.addItem(cartItem);
+            }
+
+            return RedirectToAction("ShowCart");
+
+        }
+
+        public IActionResult ShowCart()
+        {
+            var cartVM = new CartViewModel()
+            {
+                CartItems = _cart.CartItems,
+                orderTotal = _cart.CartItems.Sum(i => i.getTotalPrice())
+            };
+            return  View(cartVM);
+        }
+
+        public IActionResult removeFromCart(int itemId)
+        {
+            if (_cart.CartItems.Exists(ci=>ci.Item.Id==itemId))
+            {
+                _cart.removeItem(itemId);
+            }
+           return RedirectToAction("ShowCart");
+
+
         }
         public IActionResult Privacy()
         {

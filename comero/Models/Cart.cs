@@ -14,16 +14,16 @@ namespace comero.Models
         public int OrderId { get; set; }
         public List<CartItem> CartItems { get; set; }
 
-        public void addItem(CartItem item)
+        public void addItem(CartItem cartItem)
         {
-            if (CartItems.Exists(i=>i.Item.Id==item.Id))
+            if (CartItems.Exists(i=>i.Item.Id== cartItem.Item.Id))
             {
-                CartItems.Find(i => i.Item.Id == item.Id).Quantity += 1;
+                CartItems.Find(i => i.Item.Id == cartItem.Item.Id).Quantity += 1;
 
             }
             else
             {
-                CartItems.Add(item);
+                CartItems.Add(cartItem);
             }
         }
 
